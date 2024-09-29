@@ -49,7 +49,7 @@ The application provides a CLI interface for various operations. Here are the av
   flask user job_list
   ```
 
-### Job Commands
+### Job Seeker Commands
 
 - View accepted job offers for a job seeker:
   ```
@@ -98,10 +98,3 @@ The application uses SQLAlchemy with the following main models:
 - Job
 - Application
 
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## License
-
-This project is licensed under the [MIT License](LICENSE).
