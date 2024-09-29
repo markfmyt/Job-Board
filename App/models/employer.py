@@ -5,6 +5,8 @@ class Employer(User):
     __tablename__ = 'employers'
     id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
     company_name = db.Column(db.String(100), nullable=False)
+
+    # Set in such a way that if a Employer gets deleted, their job_listings gets deleted as well
     job_listings = db.relationship('Job', backref='employer', lazy=True, cascade="all, delete-orphan")
 
     __mapper_args__ = {
