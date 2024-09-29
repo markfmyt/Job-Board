@@ -70,9 +70,9 @@ Here's a step-by-step guide to get you started with the Job Application System:
    ```
    Note: The 1 represents the application ID.
 
-8. View job offers (as job seeker):
+8. View job application status for all applications for a particular job seeker:
    ```
-   flask job offers 1
+   flask job status 1
    ```
    Note: The 1 represents the job seeker's user ID.
 
@@ -104,9 +104,9 @@ The application provides a CLI interface for various operations. Here are the av
 
 ### Job Commands
 
-- View accepted job offers for a job seeker:
+- View job application status for all applications for a particular job seeker:
   ```
-  flask job offers <job_seeker_id>
+  flask job status <job_seeker_id>
   ```
 
 - Apply to a job:
