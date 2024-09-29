@@ -41,13 +41,31 @@ def review_application(application_id, is_accepted):
     return f'Application {application_id} has been {status}.'
 
 # Controller function for job seekers to view their accepted applications [JOB_SEEKER]
-def view_job_offers(job_seeker_id):
+def view_job_status(job_seeker_id):
     job_seeker = JobSeeker.query.get(job_seeker_id)
     if not job_seeker:
         return f"Job Seeker with ID {job_seeker_id} does not exist."
+
+    # Get all applications and their statuses for the job seeker
+    applications_status = []
     
-    offers = [app for app in job_seeker.applications if app.is_accepted]
-    return offers
+    for app in job_seeker.applications:
+        status = "Pending"
+        if app.is_accepted is True:
+            status = "Accepted"
+        elif app.is_accepted is False:
+            status = "Rejected"
+
+        # Collect job details with the status
+        applications_status.append({
+            "job_id": app.job_id,
+            "job_category": app.job.category,
+            "description": app.job.description,
+            "status": status
+        })
+
+    return applications_status
+
 
 # Controller function to create a job advertisement [EMPLOYER]
 def create_job(category, description, employer_id):
