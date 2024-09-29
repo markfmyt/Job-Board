@@ -4,6 +4,8 @@ from .user import User
 class JobSeeker(User):
     __tablename__ = 'job_seekers'
     id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
+
+    # Set in such a way that if a JobSeeker gets deleted, their applications gets deleted as well
     applications = db.relationship('Application', backref='job_seeker', lazy=True, cascade="all, delete-orphan")
 
     __mapper_args__ = {
