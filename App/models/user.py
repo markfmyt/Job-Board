@@ -9,6 +9,11 @@ class User(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     user_type = db.Column(db.String(50), nullable=False)
 
+    __mapper_args__ = {
+        'polymorphic_identity': 'user',
+        'polymorphic_on': user_type
+    }
+
     def __init__(self, username, password, email, user_type):
         self.username = username
         self.password = password
@@ -28,4 +33,5 @@ class User(db.Model):
     def check_password(self, password):
         """Check hashed password."""
         return check_password_hash(self.password, password)
+
 
