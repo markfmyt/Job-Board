@@ -13,8 +13,7 @@ This is a Flask-based Job Application System that allows users to sign up, creat
 
 1. Clone the repository:
    ```
-   git clone https://github.com/yourusername/job-application-system.git
-   cd job-application-system
+   git clone https://github.com/markfmyt/Job-Board
    ```
 
 2. Install the required dependencies:
