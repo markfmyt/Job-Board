@@ -150,7 +150,3 @@ The application uses SQLAlchemy with the following main models:
 - User (base class for Admin, Employer, and JobSeeker)
 - Job
 - Application
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
