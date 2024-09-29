@@ -4,7 +4,7 @@ from flask.cli import AppGroup
 from flask_sqlalchemy import SQLAlchemy
 from App.database import db, init_db, get_migrate
 from App import User, Admin, Employer, JobSeeker, Job, Application
-from App import (create_user, login_user, review_application, view_job_offers, create_job, apply_to_job, get_applicants_for_job, initialize)
+from App import (create_user, login_user, review_application, view_job_status, create_job, apply_to_job, get_applicants_for_job, initialize)
 from App.main import create_app
 
 app = create_app()
@@ -63,15 +63,14 @@ job_cli = AppGroup('job', help='Job object commands')
 # Usage: flask job offers <job_seeker_id> // View Accepted Jobs [JOB_SEEKER]
 @job_cli.command("offers", help="View accepted job offers for a job seeker")
 @click.argument("job_seeker_id")
-def view_job_offers_command(job_seeker_id):
-    with app.app_context():  # Ensure we are in the app context
-        offers = view_job_offers(job_seeker_id)
-        if offers:
-            for offer in offers:
-                job = Job.query.get(offer.job_id)
-                print(f"Job ID: {job.id}, Category: {job.category}, Description: {job.description}, Employer ID: {job.employer_id}")
-        else:
-            print(f"No accepted offers for Job Seeker {job_seeker_id}.")
+def view_job_status_command(job_seeker_id):
+    applications = view_job_status(job_seeker_id)
+    if applications:
+        for application in applications:
+            print(f"Job ID: {application['job_id']}, Category: {application['job_category']}, Description: {application['description']}, Status: {application['status']}")
+    else:
+        print(f"No applications found for Job Seeker {job_seeker_id}.")
+
     
 # Usage: flask job apply <job_id> <job_seeker_id> <application_text> // Apply to Job [JOB_SEEKER]
 @job_cli.command("apply", help="Apply to a job")
@@ -79,9 +78,8 @@ def view_job_offers_command(job_seeker_id):
 @click.argument("job_seeker_id")
 @click.argument("application_text")
 def apply_command(job_id, job_seeker_id, application_text):
-    with app.app_context():  # Ensure we are in the app context
-        apply_to_job(job_id, job_seeker_id, application_text)
-        print(f'Job Seeker {job_seeker_id} applied to Job ID {job_id}.')
+    apply_to_job(job_id, job_seeker_id, application_text)
+    print(f'Job Seeker {job_seeker_id} applied to Job ID {job_id}.')
 
 app.cli.add_command(job_cli)
 
@@ -94,15 +92,14 @@ employer_cli = AppGroup('employer', help='Admin commands')
 @click.argument("application_id")
 @click.argument("decision")  # 'accept' or 'reject'
 def review_application_command(application_id, decision):
-    with app.app_context():  # Ensure we are in the app context
-        if decision.lower() == 'accept':
-            result = review_application(application_id, True)
-        elif decision.lower() == 'reject':
-            result = review_application(application_id, False)
-        else:
-            result = "Invalid decision. Use 'accept' or 'reject'."
-        
-        print(result)
+    if decision.lower() == 'accept':
+        result = review_application(application_id, True)
+    elif decision.lower() == 'reject':
+        result = review_application(application_id, False)
+    else:
+        result = "Invalid decision. Use 'accept' or 'reject'."
+    
+    print(result)
 
 # Usage: flask employer create_job <category> <description> <employer_id> // Create Job Advertisement [EMPLOYERS]
 @employer_cli.command("create_job", help="Create a job")
@@ -110,11 +107,10 @@ def review_application_command(application_id, decision):
 @click.argument("description")
 @click.argument("employer_id")
 def create_job_command(category, description, employer_id):
-    with app.app_context():  # Ensure we are in the app context
-        result = create_job(category, description, employer_id)
-        print(result)
+    result = create_job(category, description, employer_id)
+    print(result)
 
-# Usage: flask employer view_applicants // View Applicants [EMPLOYER]
+# Usage: flask employer view_applicants <job_id> // View Applicants [EMPLOYER]
 @employer_cli.command("view_applicants", help="List all applicants for a specific job")
 @click.argument("job_id")
 def get_applicants_for_job_command(job_id):
@@ -137,35 +133,33 @@ admin_cli = AppGroup('admin', help='Admin commands')
 # Usage: flask admin print_all 
 @admin_cli.command("print_all", help="Print all entities in the database")
 def print_all_entities_command():
-    with app.app_context():  # Ensure we are in the app context
-        users = User.query.all()
-        jobs = Job.query.all()
-        applications = Application.query.all()
+    users = User.query.all()
+    jobs = Job.query.all()
+    applications = Application.query.all()
 
-        print("\n--- Users ---")
-        for user in users:
-            print(f'UserID: {user.id} Username: {user.username}, Role: {user.user_type}')
+    print("\n--- Users ---")
+    for user in users:
+        print(f'UserID: {user.id} Username: {user.username}, Role: {user.user_type}')
 
-        print("\n--- Jobs ---")
-        for job in jobs:
-            print(f'Job ID: {job.id}, Category: {job.category}, Description: {job.description}, Employer ID: {job.employer_id}')
+    print("\n--- Jobs ---")
+    for job in jobs:
+        print(f'Job ID: {job.id}, Category: {job.category}, Description: {job.description}, Employer ID: {job.employer_id}')
 
-        for application in applications:
-            if application.is_accepted is True:
-                status = "Accepted"
-            elif application.is_accepted is False:
-                status = "Rejected"
-            else:
-                status = "Pending"
-            
-            print(f'Application ID: {application.application_id}, Job ID: {application.job_id}, Job Seeker ID: {application.job_seeker_id}, Status: {status}')
+    for application in applications:
+        if application.is_accepted is True:
+            status = "Accepted"
+        elif application.is_accepted is False:
+            status = "Rejected"
+        else:
+            status = "Pending"
+        
+        print(f'Application ID: {application.application_id}, Job ID: {application.job_id}, Job Seeker ID: {application.job_seeker_id}, Status: {status}')
 
 
 @admin_cli.command("drop_all", help="Drop all tables in the database")
 def drop_all_command():
-    with app.app_context():  # Ensure we are in the app context
-        db.drop_all()
-        print("All tables dropped.")
+    db.drop_all()
+    print("All tables dropped.")
 # Usage: flask admin drop_all
 
 app.cli.add_command(admin_cli)
