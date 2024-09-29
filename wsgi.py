@@ -59,8 +59,8 @@ app.cli.add_command(user_cli)
 Job Commands
 '''
 job_cli = AppGroup('job', help='Job object commands')
-# Usage: flask job offers <job_seeker_id> // View Accepted Jobs [JOB_SEEKER]
-@job_cli.command("offers", help="View accepted job offers for a job seeker")
+# Usage: flask job status <job_seeker_id> // View Accepted Jobs [JOB_SEEKER]
+@job_cli.command("status", help="View application status")
 @click.argument("job_seeker_id")
 def view_job_status_command(job_seeker_id):
     applications = view_job_status(job_seeker_id)
