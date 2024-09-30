@@ -102,7 +102,7 @@ The application provides a CLI interface for various operations. Here are the av
   flask user job_list
   ```
 
-### Job Commands
+### Job Seeker Commands
 
 - View job application status for all applications for a particular job seeker:
   ```
