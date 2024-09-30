@@ -141,7 +141,7 @@ The application provides a CLI interface for various operations. Here are the av
 
 - Drop all tables in the database:
   ```
-  flask admin drop_all
+  flask admin drop_all <admin_id>
   ```
 
 ## Database Schema
