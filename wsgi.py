@@ -4,7 +4,7 @@ from flask.cli import AppGroup
 from flask_sqlalchemy import SQLAlchemy
 from App.database import db, init_db, get_migrate
 from App import User, Admin, Employer, JobSeeker, Job, Application
-from App import (remove_application, remove_job, remove_user, create_user, login_user, review_application, view_job_status, create_job, apply_to_job, get_applicants_for_job, initialize)
+from App import (get_all_users, get_all_jobs, get_all_entities, drop_database, remove_application, remove_job, remove_user, create_user, login_user, review_application, view_job_status_all, view_job_status, create_job, apply_to_job, get_applicants_for_job, initialize)
 from App.main import create_app
 
 app = create_app()
@@ -16,7 +16,6 @@ migrate = get_migrate(app)
 def init_db_command():
     initialize()
     print('Database initialized.')
-
 
 '''
 User Commands
@@ -39,19 +38,15 @@ def signup_user_command(username, password, email, role):
 # Usage: flask user list_all
 @user_cli.command("list_all", help="Lists users in the database")
 def list_users_command():
-    users = User.query.all()
-    for user in users:
-        print(f'User: {user.username}, Role: {user.user_type}')
+    output = get_all_users()
+    print(output)
 
 # Usage: flask user job_list // View Jobs [ALL USERS]
-@user_cli.command("job_list", help="List all job postings") 
+@user_cli.command("job_list", help="List all job postings")
 def list_jobs_command():
-    jobs = Job.query.all()
-    if jobs:
-        for job in jobs:
-            print(f"Job ID: {job.id}, Category: {job.category}, Description: {job.description}, Date Posted: {job.date_posted}, Employer ID: {job.employer_id}")
-    else:
-        print("No jobs available.")
+    output = get_all_jobs()
+    print(output)
+
 
 app.cli.add_command(user_cli)
 
@@ -59,18 +54,27 @@ app.cli.add_command(user_cli)
 Job Commands
 '''
 job_cli = AppGroup('job', help='Job object commands')
-# Usage: flask job status <job_seeker_id> // View Accepted Jobs [JOB_SEEKER]
-@job_cli.command("status", help="View application status")
+# Usage:  flask job application_all <job_seeker_id> // View Accepted Jobs [JOB_SEEKER]
+@job_cli.command("application_all", help="View job applications")
 @click.argument("job_seeker_id")
-def view_job_status_command(job_seeker_id):
-    applications = view_job_status(job_seeker_id)
+def view_job_status_all_command(job_seeker_id):
+    applications = view_job_status_all(job_seeker_id)
     if applications:
         for application in applications:
             print(f"Job ID: {application['job_id']}, Category: {application['job_category']}, Description: {application['description']}, Status: {application['status']}")
     else:
         print(f"No applications found for Job Seeker {job_seeker_id}.")
 
-    
+# Usage:  flask job status <job_seeker_id> <application_id>// View Application Status [JOB_SEEKER]
+@job_cli.command("status", help="View job applications")
+@click.argument("job_seeker_id")
+@click.argument("application_id")
+def view_job_status_command(job_seeker_id, application_id):
+    result = view_job_status(job_seeker_id,application_id)
+    print(result)
+
+
+
 # Usage: flask job apply <job_id> <job_seeker_id> <application_text> // Apply to Job [JOB_SEEKER]
 @job_cli.command("apply", help="Apply to a job")
 @click.argument("job_id")
@@ -132,37 +136,14 @@ admin_cli = AppGroup('admin', help='Admin commands')
 # Usage: flask admin print_all 
 @admin_cli.command("print_all", help="Print all entities in the database")
 def print_all_entities_command():
-    users = User.query.all()
-    jobs = Job.query.all()
-    applications = Application.query.all()
+    output = get_all_entities()
+    print(output)
 
-    print("\n--- Users ---")
-    if users:
-        for user in users:
-            print(f'UserID: {user.id} Username: {user.username}, Role: {user.user_type}')
-
-    print("\n--- Jobs ---")
-    if jobs:
-        for job in jobs:
-            print(f'Job ID: {job.id}, Category: {job.category}, Description: {job.description}, Employer ID: {job.employer_id}')
-
-    print("\n--- Applications ---")
-    if applications:
-        for application in applications:
-            if application.is_accepted is True:
-                status = "Accepted"
-            elif application.is_accepted is False:
-                status = "Rejected"
-            else:
-                status = "Pending"
-            
-            print(f'Application ID: {application.application_id}, Job ID: {application.job_id}, Job Seeker ID: {application.job_seeker_id}, Status: {status}')
-
-# Usage: flask admin drop_all
+# Usage: flask admin drop_all <admin_id>
 @admin_cli.command("drop_all", help="Drop all tables in the database")
-def drop_all_command():
-    db.drop_all()
-    print("All tables dropped.")
+@click.argument('admin_id')
+def drop_all_command(admin_id):
+    print(drop_database(admin_id))
 
 # Usage: flask admin remove_user <user_id>
 @admin_cli.command('remove_user', help="Remove a user by ID")
