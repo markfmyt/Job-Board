@@ -164,3 +164,6 @@ The application uses SQLAlchemy with the following main models:
 - User (base class for Admin, Employer, and JobSeeker)
 - Job
 - Application
+
+## Credits
+This repository made use of a template from [FlaskMVC Template](https://github.com/uwidcit/flaskmvc).
