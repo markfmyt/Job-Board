@@ -72,9 +72,9 @@ Here's a step-by-step guide to get you started with the Job Application System:
 
 8. View job application status for all applications for a particular job seeker:
    ```
-   flask job status 1
+   flask job status 1 1
    ```
-   Note: The 1 represents the job seeker's user ID.
+   Note: The first 1 represents the job seeker's user ID and the second 1 represents the application id.
 
 This walkthrough demonstrates the basic flow of the application, from user creation to job application and review.
 
