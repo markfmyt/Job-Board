@@ -40,36 +40,31 @@ Here's a step-by-step guide to get you started with the Job Application System:
    flask user signup amazon jungle12 amazon@mail.com employer
    ```
 
-3. View all users (as admin):
-   ```
-   flask admin print_all
-   ```
-
-4. Create a job listing (as employer):
+3. Create a job listing (as employer):
    ```
    flask employer create_job "Software Engineer" "Looking for backend developers with React experience" 2
    ```
    Note: The number 2 at the end represents the employer's user ID.
 
-5. Apply for the job (as job seeker):
+4. Apply for the job (as job seeker):
    ```
    flask job apply 1 1 "Hello, I have 10 years of React experience"
    ```
    Note: The first 1 is the job ID, and the second 1 is the job seeker's user ID.
 
-6. View applicants for the job (as employer):
+5. View applicants for the job (as employer):
    ```
    flask employer view_applicants 1
    ```
    Note: The 1 represents the job ID.
 
-7. Review and accept the application (as employer):
+6. Review and accept the application (as employer):
    ```
    flask employer review 1 accept
    ```
    Note: The 1 represents the application ID.
 
-8. View job application status for all applications for a particular job seeker:
+7. View job application status for all applications for a particular job seeker:
    ```
    flask job status 1 1
    ```
