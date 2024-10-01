@@ -104,9 +104,14 @@ The application provides a CLI interface for various operations. Here are the av
 
 ### Job Seeker Commands
 
-- View job application status for all applications for a particular job seeker:
+- View all job applications:
   ```
-  flask job status <job_seeker_id>
+  flask job application_all <job_seeker_id>
+  ```
+
+- View a particular job application:
+  ```
+  flask job status <job_seeker_id> <application_id>
   ```
 
 - Apply to a job:
@@ -142,6 +147,21 @@ The application provides a CLI interface for various operations. Here are the av
 - Drop all tables in the database:
   ```
   flask admin drop_all <admin_id>
+  ```
+  
+- Removes a particular user from the database
+  ```
+  flask admin remove_user <user_id>
+  ```
+
+- Removes a particular job from the database
+  ```
+  flask admin remove_job <job_id>
+  ```
+  
+- Removes a particular application from the database
+  ```
+  flask admin remove_application <application_id>
   ```
 
 ## Database Schema
