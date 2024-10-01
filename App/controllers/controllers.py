@@ -34,6 +34,9 @@ def create_user(username, password, email, role):
     db.session.add(user)
     db.session.commit()
 
+
+
+
 # Controller function to log in a user
 def login_user(username, password):
     user = User.query.filter_by(username=username).first()  # Find user by username
@@ -55,7 +58,7 @@ def review_application(application_id, is_accepted):
     return f'Application {application_id} has been {status}.'
 
 # Controller function for job seekers to view their accepted applications [JOB_SEEKER]
-def view_job_status(job_seeker_id):
+def view_job_status_all(job_seeker_id):
     job_seeker = JobSeeker.query.get(job_seeker_id)
     if not job_seeker:
         return f"Job Seeker with ID {job_seeker_id} does not exist."
@@ -79,6 +82,27 @@ def view_job_status(job_seeker_id):
         })
 
     return applications_status
+
+def view_job_status(job_seeker_id, application_id):
+    # Retrieve the job seeker
+    job_seeker = JobSeeker.query.get(job_seeker_id)
+    if not job_seeker:
+        return f"Job Seeker with ID {job_seeker_id} does not exist."
+
+    # Retrieve the specific application for the job seeker
+    application = Application.query.filter_by(application_id=application_id, job_seeker_id=job_seeker_id).first()
+    if not application:
+        return f"Application with ID {application_id} does not exist for Job Seeker {job_seeker_id}."
+
+    status = "Pending"
+    if application.is_accepted is True:
+        status = "Accepted"
+    elif application.is_accepted is False:
+        status = "Rejected"
+
+    # Check is not needed for this because of data integrity
+    job = Job.query.get(application.job_id)
+    return f"Job ID: {job.id}, Category: {job.category}, Description: {job.description}, Status: {status}"
 
 
 # Controller function to create a job advertisement [EMPLOYER]
@@ -115,6 +139,29 @@ def apply_to_job(job_id, job_seeker_id, application_text):
     db.session.commit()
     return f"Application submitted for Job {job_id} by Job Seeker {job_seeker_id}."
 
+# Controller function for job seekers to apply to a job [ALL_USERS]
+def get_all_jobs():
+    jobs = Job.query.all()
+    if not jobs:
+        return "No jobs available."
+    
+    jobs_str = "\n--- Job Postings ---\n"
+    for job in jobs:
+        jobs_str += f"Job ID: {job.id}, Category: {job.category}, Description: {job.description}, Date Posted: {job.date_posted}, Employer ID: {job.employer_id}\n"
+    
+    return jobs_str
+
+# Controller function for job seekers to apply to a job [ADMIN]
+def get_all_users():
+    users = User.query.all()
+    if not users:
+        return "No users found."
+    
+    users_str = "\n--- Users ---\n"
+    for user in users:
+        users_str += f"User: {user.username}, Role: {user.user_type}\n"
+    
+    return users_str
 
 # Controller function to retrieve applicants for a specific job [EMPLOYER]
 def get_applicants_for_job(job_id):
@@ -150,6 +197,44 @@ def remove_application(application_id):
     db.session.delete(application)
     db.session.commit()
     return f"Application with ID {application_id} removed successfully."
+
+# Controller function to initialize the database [ADMIN]
+def drop_database(admin_id):
+    admin = Admin.query.get(admin_id)
+    if not admin:
+        return f"Admin with ID {admin_id} does not exist."
+    db.drop_all()
+    return f"All tables dropped."
+
+# Controller view the entire database [ADMIN]
+def get_all_entities():
+    users = User.query.all()
+    jobs = Job.query.all()
+    applications = Application.query.all()
+
+    users_str = "\n--- Users ---\n"
+    if users:
+        for user in users:
+            users_str += f'UserID: {user.id} Username: {user.username}, Role: {user.user_type}\n'
+
+    jobs_str = "\n--- Jobs ---\n"
+    if jobs:
+        for job in jobs:
+            jobs_str += f'Job ID: {job.id}, Category: {job.category}, Description: {job.description}, Employer ID: {job.employer_id}\n'
+
+    applications_str = "\n--- Applications ---\n"
+    if applications:
+        for application in applications:
+            if application.is_accepted is True:
+                status = "Accepted"
+            elif application.is_accepted is False:
+                status = "Rejected"
+            else:
+                status = "Pending"
+            
+            applications_str += f'Application ID: {application.application_id}, Job ID: {application.job_id}, Job Seeker ID: {application.job_seeker_id}, Status: {status}\n'
+
+    return users_str + jobs_str + applications_str
 
 # Controller function to initialize the database [ADMIN]
 def initialize():
