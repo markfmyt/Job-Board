@@ -6,7 +6,7 @@ This is a Flask-based Job Application System that allows users to sign up, creat
 
 - Job listing creation and management
 - Job application submission and review
-- Role-based access control (Admin, Employer, Job Seeker)
+- User group based commands (Admin, Employer, Job Seeker)
 
 ## Installation
 
